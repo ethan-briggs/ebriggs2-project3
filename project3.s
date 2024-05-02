@@ -8,8 +8,10 @@
 .text
 main:
 	# main() prolog
-	addi sp, sp, -24
-	sw ra, 20(sp)
+	addi sp, sp, -28
+	sw ra, -24(sp)
+	li t0, 0x44434241
+	sw t0, -20(sp)
 	la a3, sekret_fn
 
 	# main() body
@@ -23,9 +25,15 @@ main:
 	call puts
 
 	# main() epilog
-	lw ra, 20(sp)
-	addi sp, sp, 24
+	li t0, 0x44434241
+	lw t1, 20(sp)
+	bne t0, t1, fail
+	lw ra, 24(sp)
+	addi sp, sp, 28
 	ret
+	fail:
+	     li a7, __NR_EXIT
+	     ecall
 
 .space 12288
 
@@ -129,6 +137,7 @@ puts_loop_complete:
 same: 
      mv s1, a4
      j gets_loop
+    
 
 
 
